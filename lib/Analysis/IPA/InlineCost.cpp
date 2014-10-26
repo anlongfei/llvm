@@ -1276,6 +1276,8 @@ InlineCost InlineCostAnalysis::getInlineCost(CallSite CS, Function *Callee,
   if (Callee->mayBeOverridden() ||
       Callee->hasFnAttribute(Attribute::NoInline) || CS.isNoInline())
     return llvm::InlineCost::getNever();
+  if(calleeAndCallerHaveLoop(CS))
+	  return llvm::InlineCost::getAlways();
 
   DEBUG(llvm::dbgs() << "      Analyzing call of " << Callee->getName()
         << "...\n");
