@@ -131,11 +131,11 @@ public:
   //
   //  Note: This is used by out-of-tree passes, please do not remove without
   //  adding a replacement API.
+  bool calleeAndCallerHaveLoop(CallSite CS);
   InlineCost getInlineCost(CallSite CS, Function *Callee, int Threshold);
 
   /// \brief Minimal filter to detect invalid constructs for inlining.
   bool isInlineViable(Function &Callee);
-  bool calleeAndCallerHaveLoop(CallSite CS);
 };
 
 }
