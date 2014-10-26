@@ -32,6 +32,7 @@
 #include "llvm/Support/GetElementPtrTypeIterator.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Analysis/LoopInfo.h"
+#include "llvm/Analysis/CallSiteFunction.h"
 using namespace llvm;
 
 STATISTIC(NumCallsAnalyzed, "Number of call sites analyzed");
@@ -1226,16 +1227,23 @@ static bool functionsHaveCompatibleAttributes(Function *Caller,
          attributeMatches(Caller, Callee, Attribute::SanitizeThread);
 }
 bool InlineCostAnalysis::calleeAndCallerHaveLoop(CallSite CS){  //alf
-	int Caller_LNum = 0, Callee_LNum = 0;
-	Function *callee, *caller; 
+	int Caller_LNum = 0;
+	int Callee_LNum = 0;
+
+	CallSiteFunction *CSF_caller,*CSF_callee;
+	Function *callee, *caller;
+
 	caller = CS.getCaller();
 	callee = CS.getCalledFunction();
-	/*   template<typename AnalysisType>
-	//      AnalysisType &Pass::getAnalysis(Function &F) { }
-	得到caller的loop信息：loopinfo*/
-	
-	LoopInfo *LI_caller = &getAnalysis<LoopInfo>(*caller);
-	LoopInfo *LI_callee = &getAnalysis<LoopInfo>(*callee);
+
+	CSF_caller->F = caller;
+	CSF_callee->F = callee;
+
+	CSF_caller->runOnFunction(*caller);
+	CSF_callee->runOnFunction(*callee);
+
+	LoopInfo *LI_caller = CSF_caller->LI;
+	LoopInfo *LI_callee = CSF_caller->LI;
 
 	Caller_LNum = LI_caller->end() - LI_caller->begin();
 	Callee_LNum = LI_callee->end() - LI_callee->begin();
@@ -1244,6 +1252,25 @@ bool InlineCostAnalysis::calleeAndCallerHaveLoop(CallSite CS){  //alf
 		return true;
 	else 
 		return false;
+
+//	int Caller_LNum = 0, Callee_LNum = 0;
+//	Function *callee, *caller; 
+//	caller = CS.getCaller();
+//	callee = CS.getCalledFunction();
+//	/*   template<typename AnalysisType>
+//	//      AnalysisType &Pass::getAnalysis(Function &F) { }
+//	得到caller的loop信息：loopinfo*/
+//	
+//	LoopInfo *LI_caller = &getAnalysis<LoopInfo>(*caller);
+//	LoopInfo *LI_callee = &getAnalysis<LoopInfo>(*callee);
+//
+//	Caller_LNum = LI_caller->end() - LI_caller->begin();
+//	Callee_LNum = LI_callee->end() - LI_callee->begin();
+//
+//	if(Caller_LNum > 0 && Callee_LNum > 0)
+//		return true;
+//	else 
+//		return false;
 }
 
 
