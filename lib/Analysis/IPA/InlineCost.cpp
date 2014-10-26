@@ -1230,20 +1230,21 @@ bool InlineCostAnalysis::calleeAndCallerHaveLoop(CallSite CS){  //alf
 	int Caller_LNum = 0;
 	int Callee_LNum = 0;
 
-	CallSiteFunction *CSF_caller,*CSF_callee;
+	CallSiteFunction CSF_caller,CSF_callee;
 	Function *callee, *caller;
 
 	caller = CS.getCaller();
 	callee = CS.getCalledFunction();
+	CSF_caller.setFunction(caller);
+	CSF_callee.setFunction(callee);
+//	CSF_caller->F = caller;
+//	CSF_callee->F = callee;
 
-	CSF_caller->F = caller;
-	CSF_callee->F = callee;
+	CSF_caller.runOnFunction(*caller);
+	CSF_callee.runOnFunction(*callee);
 
-	CSF_caller->runOnFunction(*caller);
-	CSF_callee->runOnFunction(*callee);
-
-	LoopInfo *LI_caller = CSF_caller->LI;
-	LoopInfo *LI_callee = CSF_caller->LI;
+	LoopInfo *LI_caller = CSF_caller.LI;
+	LoopInfo *LI_callee = CSF_caller.LI;
 
 	Caller_LNum = LI_caller->end() - LI_caller->begin();
 	Callee_LNum = LI_callee->end() - LI_callee->begin();
