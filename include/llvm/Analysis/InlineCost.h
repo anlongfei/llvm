@@ -135,6 +135,7 @@ public:
 
   /// \brief Minimal filter to detect invalid constructs for inlining.
   bool isInlineViable(Function &Callee);
+  bool InlineCostAnalysis::calleeAndCallerHaveLoop(CallSite CS);
 };
 
 }
